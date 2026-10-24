@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Dashboard Logístico Inteligente</title>
+
+<style>
+
+/* ===========================
+   VARIABLES GLOBALES
+=========================== */
+:root{
+    --azul:#2563eb;
+    --verde:#16a34a;
+    --amarillo:#eab308;
+    --rojo:#dc2626;
+    --gris:#f3f4f6;
+    --oscuro:#1e293b;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:var(--gris);
+    font-family:Segoe UI,sans-serif;
+}
+
+/* ===========================
+   HEADER
+=========================== */
+header{
+    background:linear-gradient(135deg,#2563eb,#1e3a8a);
+    color:white;
+    padding:20px;
+}
+
+header h1{
+    font-size:28px;
+}
+
+/* ===========================
+   KPIS
+=========================== */
+
+.kpis{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+.card h3{
+    color:#555;
+    margin-bottom:10px;
+}
+
+.valor{
+    font-size:35px;
+    font-weight:bold;
+}
+
+.azul{color:var(--azul);}
+.verde{color:var(--verde);}
+.amarillo{color:var(--amarillo);}
+.rojo{color:var(--rojo);}
+
+/* ===========================
+   SECCIONES
+=========================== */
+
+.section{
+    margin:20px;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.section h2{
+    margin-bottom:15px;
+    color:var(--oscuro);
+}
+
+/* ===========================
+   FORMULARIOS
+=========================== */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:10px;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:10px;
+}
+
+button{
+    border:none;
+    background:var(--azul);
+    color:white;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+/* ===========================
+   TABLA
+=========================== */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th{
+    background:var(--azul);
+    color:white;
+    padding:12px;
+}
+
+td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+    text-align:center;
+}
+
+.badge{
+    padding:6px 12px;
+    border-radius:20px;
+    color:white;
+    font-size:12px;
+}
+
+.transito{background:#3b82f6;}
+.entregado{background:#16a34a;}
+.retraso{background:#eab308;}
+.devolucion{background:#dc2626;}
+
+/* ===========================
+   ALERTAS
+=========================== */
+
+.alerta{
+    padding:12px;
+    margin-bottom:10px;
+    border-left:5px solid orange;
+    background:#fff7e6;
+    border-radius:8px;
+}
+
+.critica{
+    border-left:5px solid red;
+    background:#ffe5e5;
+}
+
+/* ===========================
+   SEMAFORO
+=========================== */
+
+.semaforo{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+.luz{
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    opacity:.2;
+}
+
+.on{
+    opacity:1;
+}
+
+.verde-luz{background:green;}
+.amarillo-luz{background:gold;}
+.rojo-luz{background:red;}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>📦 Dashboard Inteligente de Seguimiento Logístico</h1>
+    <p>Control de despachos, novedades, quejas y eventos no deseados</p>
+</header>
+
+<div class="kpis">
+
+    <div class="card">
+        <h3>Despachados</h3>
+        <div class="valor azul" id="despachados">0</div>
+    </div>
+
+    <div class="card">
+        <h3>Entregados</h3>
+        <div class="valor verde" id="entregados">0</div>
+    </div>
+
+    <div class="card">
+        <h3>Retrasos</h3>
+        <div class="valor amarillo" id="retrasos">0</div>
+    </div>
+
+    <div class="card">
+        <h3>Devoluciones</h3>
+        <div class="valor rojo" id="devoluciones">0</div>
+    </div>
+
+</div>
+
+<div class="section">
+
+    <h2>➕ Registrar Pedido</h2>
+
+    <div class="grid">
+
+        <input id="guia" placeholder="Guía">
+
+        <input id="cliente" placeholder="Cliente">
+
+        <input id="transportadora" placeholder="Transportadora">
+
+        <input type="date" id="fecha">
+
+        <select id="estado">
+            <option>En tránsito</option>
+            <option>Entregado</option>
+            <option>Retraso</option>
+            <option>Devolución</option>
+        </select>
+
+        <select id="monitoreado">
+            <option>Si</option>
+            <option>No</option>
+        </select>
+
+    </div>
+
+    <br>
+
+    <button onclick="guardarPedido()">
+        Registrar Pedido
+    </button>
+
+</div>
+
+<div class="section">
+
+    <h2>🔎 Buscar Pedido</h2>
+
+    <input id="busqueda"
+           placeholder="Buscar por guía o cliente"
+           onkeyup="filtrarPedidos()">
+
+</div>
+
+<div class="section">
+
+    <h2>📱 Registrar Queja</h2>
+
+    <div class="grid">
+
+        <input id="quejaCliente"
+               placeholder="Cliente">
+
+        <input id="quejaGuia"
+               placeholder="Guía">
+
+        <textarea id="quejaTexto"
+                  placeholder="Descripción"></textarea>
+
+    </div>
+
+    <br>
+
+    <button onclick="registrarQueja()">
+        Registrar Queja
+    </button>
+
+</div>
+
+<div class="section">
+
+    <h2>🚨 Alertas Inteligentes</h2>
+
+    <div class="semaforo">
+
+        <div id="verde" class="luz verde-luz"></div>
+        <div id="amarillo" class="luz amarillo-luz"></div>
+        <div id="rojo" class="luz rojo-luz"></div>
+
+    </div>
+
+    <br>
+
+    <div id="alertas"></div>
+
+</div>
+
+<div class="section">
+
+    <h2>📋 Seguimiento de Pedidos</h2>
+
+    <table>
+
+        <thead>
+
+        <tr>
+            <th>Guía</th>
+            <th>Cliente</th>
+            <th>Transportadora</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Monitoreado</th>
+        </tr>
+
+        </thead>
+
+        <tbody id="tabla"></tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+/* ===========================
+   CARGAR DATOS
+=========================== */
+
+let pedidos =
+JSON.parse(localStorage.getItem("pedidos"))
+|| [];
+
+/* ===========================
+   GUARDAR PEDIDO
+=========================== */
+
+function guardarPedido(){
+
+let pedido={
+    guia:guia.value,
+    cliente:cliente.value,
+    transportadora:transportadora.value,
+    fecha:fecha.value,
+    estado:estado.value,
+    monitoreado:monitoreado.value
+};
+
+pedidos.push(pedido);
+
+localStorage.setItem(
+"pedidos",
+JSON.stringify(pedidos));
+
+mostrarPedidos();
+actualizarKPIs();
+validarRiesgo(pedido);
+
+}
+
+/* ===========================
+   MOSTRAR PEDIDOS
+=========================== */
+
+function mostrarPedidos(){
+
+let html="";
+
+pedidos.forEach(p=>{
+
+let clase="transito";
+
+if(p.estado==="Entregado")
+clase="entregado";
+
+if(p.estado==="Retraso")
+clase="retraso";
+
+if(p.estado==="Devolución")
+clase="devolucion";
+
+html+=`
+<tr>
+<td>${p.guia}</td>
+<td>${p.cliente}</td>
+<td>${p.transportadora}</td>
+<td>${p.fecha}</td>
+<td>
+<span class="badge ${clase}">
+${p.estado}
+</span>
+</td>
+<td>${p.monitoreado}</td>
+</tr>
+`;
+
+});
+
+tabla.innerHTML=html;
+
+}
+
+/* ===========================
+   KPIS
+=========================== */
+
+function actualizarKPIs(){
+
+despachados.innerText=pedidos.length;
+
+entregados.innerText=
+pedidos.filter(
+p=>p.estado==="Entregado"
+).length;
+
+retrasos.innerText=
+pedidos.filter(
+p=>p.estado==="Retraso"
+).length;
+
+devoluciones.innerText=
+pedidos.filter(
+p=>p.estado==="Devolución"
+).length;
+
+}
+
+/* ===========================
+   VALIDACION END
+=========================== */
+
+function validarRiesgo(p){
+
+let cont=document.getElementById("alertas");
+
+if(p.estado==="Retraso"){
+
+cont.innerHTML += `
+<div class="alerta">
+⚠ La guía ${p.guia}
+presenta retraso.
+</div>`;
+
+activarAmarillo();
+
+}
+
+if(p.monitoreado==="No"){
+
+cont.innerHTML += `
+<div class="alerta">
+⚠ La guía ${p.guia}
+no pertenece a grupo monitoreado.
+</div>`;
+
+activarAmarillo();
+
+}
+
+if(p.estado==="Devolución"){
+
+cont.innerHTML += `
+<div class="alerta critica">
+❌ EVENTO NO DESEADO:
+Devolución detectada.
+</div>`;
+
+activarRojo();
+
+}
+
+}
+
+/* ===========================
+   REGISTRAR QUEJA
+=========================== */
+
+function registrarQueja(){
+
+let cliente =
+document.getElementById("quejaCliente").value;
+
+let guia =
+document.getElementById("quejaGuia").value;
+
+let texto =
+document.getElementById("quejaTexto").value;
+
+document.getElementById("alertas").innerHTML += `
+
+<div class="alerta critica">
+📱 QUEJA CLIENTE
+
+<br><br>
+
+Cliente: ${cliente}
+
+<br>
+
+Guía: ${guia}
+
+<br>
+
+${texto}
+
+<br><br>
+
+⚠ Posible riesgo de incumplimiento del servicio
+</div>
+`;
+
+activarRojo();
+
+}
+
+/* ===========================
+   FILTRO
+=========================== */
+
+function filtrarPedidos(){
+
+let valor=
+busqueda.value.toLowerCase();
+
+let filas=
+document.querySelectorAll("#tabla tr");
+
+filas.forEach(fila=>{
+
+let texto=
+fila.innerText.toLowerCase();
+
+fila.style.display=
+texto.includes(valor)?
+"":
+"none";
+
+});
+
+}
+
+/* ===========================
+   SEMAFORO
+=========================== */
+
+function apagarSemaforo(){
+
+verde.classList.remove("on");
+amarillo.classList.remove("on");
+rojo.classList.remove("on");
+
+}
+
+function activarVerde(){
+
+apagarSemaforo();
+verde.classList.add("on");
+
+}
+
+function activarAmarillo(){
+
+apagarSemaforo();
+amarillo.classList.add("on");
+
+}
+
+function activarRojo(){
+
+apagarSemaforo();
+rojo.classList.add("on");
+
+}
+
+/* ===========================
+   INICIO
+=========================== */
+
+mostrarPedidos();
+actualizarKPIs();
+
+if(pedidos.length===0){
+activarVerde();
+}
+
+</script>
+
+</body>
+</html>
